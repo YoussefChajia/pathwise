@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:pathwise/providers/api_data.dart';
 import 'package:pathwise/screens/temp_result.dart';
 import 'package:pathwise/utils/colors.dart';
 import 'package:pathwise/utils/page_transition.dart';
@@ -19,6 +20,7 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => TextFieldProvider()),
+        ChangeNotifierProvider(create: (_) => ApiDataProvider()),
       ],
       child: const App(),
     ),
@@ -47,8 +49,9 @@ class App extends StatelessWidget {
               settings: settings,
             );
           case '/result':
+            final args = settings.arguments as String?;
             return PageTransition(
-              builder: (context) => const TempResultPage(),
+              builder: (context) => TempResultPage(argument: args ?? ''),
               settings: settings,
             );
           default:

@@ -40,7 +40,10 @@ class HomePage extends StatelessWidget {
                     Consumer<TextFieldProvider>(
                       builder: (context, provider, child) {
                         return TextFormField(
-                          controller: TextEditingController(text: provider.text),
+                          controller: provider.controller,
+                          onChanged: (value) {
+                            provider.updateText(value);
+                          },
                           decoration: const InputDecoration(
                             hintText: 'Enter a subject...',
                             hintStyle: AppTextStyles.hint,
@@ -77,7 +80,7 @@ class HomePage extends StatelessWidget {
                         ),
                         onPressed: () {
                           if (_formKey.currentState?.validate() ?? false) {
-                            Navigator.of(context).pushNamed('/result');
+                            Navigator.of(context).pushNamed('/result', arguments: Provider.of<TextFieldProvider>(context, listen: false).text);
                           }
                         },
                       ),
@@ -111,12 +114,18 @@ class HomePage extends StatelessWidget {
 }
 
 class TextFieldProvider extends ChangeNotifier {
-  String _text = '';
+  final TextEditingController controller = TextEditingController();
 
-  String get text => _text;
+  String get text => controller.text;
 
   void updateText(String newText) {
-    _text = newText;
+    controller.text = newText;
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
   }
 }
