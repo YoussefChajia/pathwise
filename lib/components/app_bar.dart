@@ -30,7 +30,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             height: 50,
             width: 50,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(5),
+              borderRadius: BorderRadius.circular(AppConstants.borderRadius),
               color: AppColors.darkGrey,
             ),
             child: IconButton(
@@ -47,7 +47,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                   height: 50,
                   width: 50,
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5),
+                    borderRadius: BorderRadius.circular(AppConstants.borderRadius),
                     color: AppColors.darkGrey,
                   ),
                   child: IconButton(

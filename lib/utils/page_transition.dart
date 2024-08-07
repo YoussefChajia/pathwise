@@ -9,7 +9,14 @@ class PageTransition<T> extends MaterialPageRoute<T> {
   @override
   Widget buildTransitions(BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation, Widget child) {
     // You can customize the animation here
+    // From bottom to top
+    // const begin = Offset(0.0, 1.0);
+    // From top to bottom
+    // const begin = Offset(0.0, -1.0);
+    // From bottom to left
     const begin = Offset(1.0, 0.0);
+    // From left to right
+    // const begin = Offset(-1.0, 0.0);
     const end = Offset.zero;
     const curve = Curves.easeInOut;
     var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
