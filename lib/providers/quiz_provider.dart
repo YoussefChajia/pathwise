@@ -2,11 +2,14 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:pathwise/models/quiz.dart';
+import 'package:pathwise/providers/api_data.dart';
 
 class QuizProvider extends ChangeNotifier {
   List<Quiz> _quizzes = [];
   int _currentIndex = 0;
   String _subject = '';
+  List<bool> _showErrors = [];
+  final ApiDataProvider _apiDataProvider = ApiDataProvider();
 
   List<Quiz> get quizzes => _quizzes;
   int get currentIndex => _currentIndex;
@@ -20,6 +23,28 @@ class QuizProvider extends ChangeNotifier {
 
   void setSubject(String subject) {
     _subject = subject;
+    notifyListeners();
+  }
+
+  Future<void> fetchQuizzes(String subject) async {
+    await _apiDataProvider.fetchAssessmentQuizzes(subject);
+    String? quizzesJson = _apiDataProvider.data;
+
+    if (quizzesJson != null) {
+      try {
+        List<dynamic> decodedQuizzes = jsonDecode(quizzesJson);
+        _subject = subject;
+        _quizzes = decodedQuizzes.map((quizJson) => Quiz.fromJson(quizJson)).toList();
+        _showErrors = List.generate(quizzes.length, (_) => false);
+        notifyListeners();
+      } catch (e) {
+        print("Error decoding quizzes: $e");
+        // Handle error (e.g., show an error message to the user)
+      }
+    } else {
+      print("No quiz data received from API");
+      // Handle error (e.g., show an error message to the user)
+    }
   }
 
   void updateAnswers(int quizIndex, List<int> selectedAnswers) {
@@ -35,7 +60,7 @@ class QuizProvider extends ChangeNotifier {
   }
 
   String quizzesToJson() {
-    List<Map<String, dynamic>> quizzesJson = quizzes.map((quiz) => quiz.toJson()).toList();
+    List<Map<String, dynamic>> quizzesJson = _quizzes.map((quiz) => quiz.toJson()).toList();
     return jsonEncode(quizzesJson);
   }
 

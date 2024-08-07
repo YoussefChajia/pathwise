@@ -1,24 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:pathwise/components/app_bar.dart';
-import 'package:pathwise/models/quiz.dart';
-import 'package:pathwise/providers/quiz_provider.dart';
 import 'package:pathwise/utils/colors.dart';
 import 'package:pathwise/utils/constants.dart';
 import 'package:pathwise/utils/text_styles.dart';
-import 'package:provider/provider.dart';
-import 'package:pathwise/providers/api_data.dart';
 
 class PreAssessmentPage extends StatelessWidget {
-  final String subject;
-
-  const PreAssessmentPage({super.key, required this.subject});
+  const PreAssessmentPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    Provider.of<QuizProvider>(context, listen: false);
     return SafeArea(
       child: Scaffold(
-        appBar: const CustomAppBar(title: 'API Results', hasActionButton: false, leadingIcon: Icons.arrow_back),
+        appBar: const CustomAppBar(title: 'API Results', hasActionButton: false),
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Column(
@@ -39,40 +32,22 @@ class PreAssessmentPage extends StatelessWidget {
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 32.0),
-                child: FutureBuilder(
-                  future: Provider.of<ApiDataProvider>(context, listen: false).fetchAssessmentQuizzes(subject),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    } else {
-                      return Consumer<ApiDataProvider>(
-                        builder: (context, apiDataProvider, child) {
-                          return SizedBox(
-                            width: double.infinity,
-                            height: 50.0,
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppConstants.borderRadius)),
-                                backgroundColor: AppColors.light,
-                              ),
-                              child: const Text(
-                                'Continue',
-                                style: AppTextStyles.buttonLight,
-                              ),
-                              onPressed: () {
-                                final quizProvider = Provider.of<QuizProvider>(context, listen: false);
-                                // Get the quizzes from the API data as JSON
-                                List<Quiz> quizzes = quizProvider.parseQuizzes(apiDataProvider.data ?? '[{}]');
-                                quizProvider.setQuizzes(quizzes);
-                                quizProvider.setSubject(subject);
-                                Navigator.of(context).pushNamed('/assessment');
-                              },
-                            ),
-                          );
-                        },
-                      );
-                    }
-                  },
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 50.0,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppConstants.borderRadius)),
+                      backgroundColor: AppColors.light,
+                    ),
+                    child: const Text(
+                      'Continue',
+                      style: AppTextStyles.buttonLight,
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).pushNamed('/assessment');
+                    },
+                  ),
                 ),
               ),
             ],

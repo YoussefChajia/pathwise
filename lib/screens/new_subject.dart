@@ -1,14 +1,14 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:pathwise/models/quiz.dart';
+import 'package:pathwise/components/app_bar.dart';
 import 'package:pathwise/providers/quiz_provider.dart';
 import 'package:pathwise/utils/colors.dart';
 import 'package:pathwise/utils/constants.dart';
 import 'package:pathwise/utils/text_styles.dart';
 import 'package:provider/provider.dart';
 
-class HomePage extends StatelessWidget {
-  HomePage({super.key});
+class NewSubjectPage extends StatelessWidget {
+  NewSubjectPage({super.key});
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -28,6 +28,7 @@ class HomePage extends StatelessWidget {
         child: GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),
           child: Scaffold(
+            appBar: const CustomAppBar(title: "New Subject", hasActionButton: false),
             body: Form(
               key: _formKey,
               child: Center(
@@ -84,7 +85,8 @@ class HomePage extends StatelessWidget {
                             onPressed: () {
                               if (_formKey.currentState?.validate() ?? false) {
                                 if (kDebugMode) print('Subject : ${provider.text}');
-                                Navigator.of(context).pushNamed('/pre-assessment', arguments: provider.text);
+                                Provider.of<QuizProvider>(context, listen: false).setSubject(provider.text);
+                                Navigator.of(context).pushNamed('/pre-assessment');
                               }
                             },
                           ),

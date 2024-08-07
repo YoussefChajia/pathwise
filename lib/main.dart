@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pathwise/providers/api_data.dart';
+import 'package:pathwise/providers/course_provider.dart';
 import 'package:pathwise/providers/quiz_provider.dart';
 import 'package:pathwise/screens/assessment.dart';
+import 'package:pathwise/screens/home.dart';
 import 'package:pathwise/screens/results.dart';
 import 'package:pathwise/screens/pre_assessment.dart';
 import 'package:pathwise/utils/colors.dart';
 import 'package:pathwise/utils/page_transition.dart';
 import 'package:provider/provider.dart';
 
-import 'screens/homepage.dart';
+import 'screens/new_subject.dart';
 
 void main() {
   SystemChrome.setSystemUIOverlayStyle(
@@ -24,6 +26,7 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (_) => ApiDataProvider()),
         ChangeNotifierProvider(create: (_) => QuizProvider()),
+        ChangeNotifierProvider(create: (_) => CourseProvider()),
       ],
       child: const App(),
     ),
@@ -43,18 +46,22 @@ class App extends StatelessWidget {
         useMaterial3: true,
       ),
       debugShowCheckedModeBanner: false,
-      initialRoute: '/',
+      initialRoute: '/new-subject',
       onGenerateRoute: (settings) {
         switch (settings.name) {
           case '/':
             return PageTransition(
-              builder: (context) => HomePage(),
+              builder: (context) => const HomePage(),
+              settings: settings,
+            );
+          case '/new-subject':
+            return PageTransition(
+              builder: (context) => NewSubjectPage(),
               settings: settings,
             );
           case '/pre-assessment':
-            final subject = settings.arguments as String;
             return PageTransition(
-              builder: (context) => PreAssessmentPage(subject: subject),
+              builder: (context) => const PreAssessmentPage(),
               settings: settings,
             );
           case '/assessment':
@@ -63,14 +70,13 @@ class App extends StatelessWidget {
               settings: settings,
             );
           case '/result':
-            final json = settings.arguments as String;
             return PageTransition(
-              builder: (context) => ResultsPage(quizzesJson: json),
+              builder: (context) => const ResultsPage(),
               settings: settings,
             );
           default:
             return PageTransition(
-              builder: (context) => HomePage(),
+              builder: (context) => const HomePage(),
               settings: settings,
             );
         }

@@ -8,7 +8,7 @@ class Quiz {
     required this.question,
     required this.options,
     required this.correctAnswers,
-    required this.userAnswers,
+    this.userAnswers = const [],
   });
 
   factory Quiz.fromJson(Map<String, dynamic> json) {
@@ -16,7 +16,7 @@ class Quiz {
       question: json['question'],
       options: List<String>.from(json['options']),
       correctAnswers: List<int>.from(json['correctAnswers']),
-      userAnswers: List<int>.from(json['userAnswers']),
+      userAnswers: List<int>.from(json['userAnswers'] ?? []),
     );
   }
 
