@@ -17,7 +17,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.hasLeadingButton = true,
     this.hasActionButton = true,
     this.leadingIcon = Icons.arrow_back,
-    this.actionIcon,
+    this.actionIcon = Icons.person_outline,
     this.onActionPressed,
   });
 
@@ -37,7 +37,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                   ),
                   child: IconButton(
                     onPressed: () => Navigator.pop(context),
-                    icon: Icon(leadingIcon),
+                    icon: Icon(leadingIcon, color: AppColors.light, size: 27),
                   ),
                 )
               : const SizedBox(),
@@ -58,7 +58,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                   ),
                   child: IconButton(
                     onPressed: onActionPressed,
-                    icon: Icon(actionIcon),
+                    icon: Icon(actionIcon, color: AppColors.light, size: 27),
                   ),
                 )
               : const SizedBox(width: 50),

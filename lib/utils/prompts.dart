@@ -55,4 +55,10 @@ Requirements:
 - The output should be a single, concise quote or statement, no longer than 3 sentences.
 ''';
   }
+
+  static String getNewCourse(String subject, String userQuizzes) {
+    return '''
+
+''';
+  }
 }

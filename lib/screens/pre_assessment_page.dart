@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pathwise/components/app_bar.dart';
+import 'package:pathwise/components/custom_app_bar.dart';
 import 'package:pathwise/utils/colors.dart';
 import 'package:pathwise/utils/constants.dart';
 import 'package:pathwise/utils/text_styles.dart';

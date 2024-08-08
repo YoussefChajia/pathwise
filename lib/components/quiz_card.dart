@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:pathwise/models/quiz.dart';
+import 'package:pathwise/models/quiz_model.dart';
 import 'package:pathwise/utils/colors.dart';
 import 'package:pathwise/utils/constants.dart';
 import 'package:pathwise/utils/text_styles.dart';

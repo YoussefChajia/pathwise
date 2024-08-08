@@ -1,8 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
-import 'package:pathwise/models/quiz.dart';
-import 'package:pathwise/providers/api_data.dart';
+import 'package:pathwise/models/quiz_model.dart';
+import 'package:pathwise/providers/api_data_provider.dart';
 
 class QuizProvider extends ChangeNotifier {
   List<Quiz> _quizzes = [];
