@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:pathwise/models/course_model.dart';
 import 'package:pathwise/utils/colors.dart';
@@ -13,7 +14,7 @@ class CourseCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        print('Course ID: ${course.id}');
+        if (kDebugMode) print('Course ID: ${course.id}');
         Navigator.pushNamed(context, '/course', arguments: course.id);
       },
       child: Padding(
@@ -21,7 +22,6 @@ class CourseCard extends StatelessWidget {
         child: Container(
           height: 170,
           decoration: BoxDecoration(
-            // make the color out of the colorName
             color: Color(course.color),
             borderRadius: BorderRadius.circular(AppConstants.borderRadius * 2),
           ),
@@ -32,7 +32,7 @@ class CourseCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  course.title ?? '',
+                  course.title,
                   style: AppTextStyles.header3,
                 ),
                 Row(

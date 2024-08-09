@@ -57,6 +57,7 @@ Requirements:
   }
 
   static String getNewCourse(String subject, String userQuizzes) {
+    // The name of the course should be 5 words or less
     return '''
 
 ''';

@@ -20,8 +20,14 @@ class _HomePageState extends State<HomePage> {
     await courseProvider.fetchAllCourses();
   }
 
+  Future<void> _fetchGeneratedCourse() async {
+    final courseProvider = Provider.of<CourseProvider>(context, listen: false);
+    courseProvider.saveCourseFromAPI();
+  }
+
   @override
   void initState() {
+    // _fetchGeneratedCourse();
     _fetchAllCourses();
     super.initState();
   }

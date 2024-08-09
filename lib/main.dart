@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pathwise/providers/course_provider.dart';
 import 'package:pathwise/providers/api_data_provider.dart';
+import 'package:pathwise/providers/lesson_provider.dart';
+import 'package:pathwise/providers/module_provider.dart';
 import 'package:pathwise/providers/quiz_provider.dart';
 import 'package:pathwise/screens/assessment_page.dart';
 import 'package:pathwise/screens/course_page.dart';
@@ -31,6 +33,8 @@ void main() async {
         ChangeNotifierProvider(create: (_) => ApiDataProvider()),
         ChangeNotifierProvider(create: (_) => QuizProvider()),
         ChangeNotifierProvider(create: (_) => CourseProvider()),
+        ChangeNotifierProvider(create: (_) => ModuleProvider()),
+        ChangeNotifierProvider(create: (_) => LessonProvider()),
       ],
       child: const App(),
     ),
