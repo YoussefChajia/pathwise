@@ -24,14 +24,6 @@ class AppTextStyles {
     color: AppColors.light,
   );
 
-  // Quiz question style
-  static const TextStyle quizTitle = TextStyle(
-    fontFamily: 'Outfit',
-    fontSize: 18.0,
-    fontWeight: FontWeight.w500,
-    color: AppColors.dark,
-  );
-
   // Body Text Style
   static const TextStyle body = TextStyle(
     fontFamily: 'Outfit',
@@ -46,6 +38,14 @@ class AppTextStyles {
     fontSize: 14.0,
     fontWeight: FontWeight.w300,
     color: AppColors.lightGrey,
+  );
+
+  // Quiz question style
+  static const TextStyle quizTitle = TextStyle(
+    fontFamily: 'Outfit',
+    fontSize: 18.0,
+    fontWeight: FontWeight.w500,
+    color: AppColors.dark,
   );
 
   // Button Text Style

@@ -20,20 +20,9 @@ class ApiDataProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> fetchAssessmentEvaluation(String subject, String userQuizzes) async {
+  Future<void> fetchGeneratedCourse(String subject, String userQuizzes) async {
     try {
-      final content = [Content.text(PromptManager.getAssessmentEvaluation(subject, userQuizzes))];
-      final response = await model.generateContent(content);
-      _data = response.text;
-    } catch (e) {
-      _data = "Error: ${e.toString()}";
-    }
-    notifyListeners();
-  }
-
-  Future<void> fetchNewCourse(String subject, String userQuizzes) async {
-    try {
-      final content = [Content.text(PromptManager.getNewCourse(subject, userQuizzes))];
+      final content = [Content.text(PromptManager.generateCourse(subject, userQuizzes))];
       final response = await model.generateContent(content);
       _data = response.text;
     } catch (e) {

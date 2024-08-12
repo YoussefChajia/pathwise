@@ -8,6 +8,7 @@ class Lesson {
   Id id = Isar.autoIncrement;
 
   late String title;
+  late String content;
   late DateTime createdAt;
   double progress = 0.0;
   bool isCompleted = false;
@@ -20,6 +21,7 @@ class Lesson {
 
   Lesson({
     required this.title,
+    required this.content,
     this.progress = 0.0,
     this.isCompleted = false,
     this.description,
@@ -29,6 +31,7 @@ class Lesson {
 
   Lesson.fromJson(Map<String, dynamic> json)
       : title = json['title'],
+        content = json['content'],
         progress = json['progress'],
         isCompleted = json['isCompleted'],
         description = json['description'],

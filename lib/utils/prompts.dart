@@ -1,7 +1,7 @@
 class PromptManager {
   static String getAssessmentQuizzes(String subject) {
     return '''
-Your task is to generate 3 distinct quizzes on the subject of $subject. Each quiz must consist of one question, with multiple answer options.
+Your task is to generate 20 distinct quizzes on the subject of $subject. Each quiz must consist of one question, with multiple answer options.
 
 For each quiz:
 
@@ -35,31 +35,38 @@ Ensure that the questions, options, correct answers, and the userAnswers field a
 ''';
   }
 
-  static String getAssessmentEvaluation(String subject, String userQuizzes) {
+  static String generateCourse(String subject, String userQuizzes) {
     return '''
-You have been provided with a JSON file containing quiz results from a user who is learning $subject. The JSON structure includes fields such as `question`, `options`, `correctAnswers`, and `userAnswers`. Based on the user's answers, analyze their performance and provide a personalized quote that:
+You are an expert instructor in $subject with extensive experience in creating tailored learning programs. Your task is to design a personalized course for a student who has just completed an assessment in $subject. Below, you will find the student's assessment results.
 
-1. Assesses the user's current understanding of $subject based on the questions they answered.
-2. Highlights the areas where they demonstrated strong knowledge.
-3. Suggests specific topics or concepts they should focus on next to improve their skills.
-
-The JSON input is as follows:
+Here is the student's assessment results:
 
 $userQuizzes
 
-Requirements:
+Now generate a clear and organized course as a JSON object with the following structure:
 
-- Start by acknowledging the user's current level based on their answers.
-- Provide positive reinforcement by mentioning what they have learned or understand well.
-- Recommend the next topics they should focus on to continue improving their $subject skills.
-- The output should be a single, concise quote or statement, no longer than 3 sentences.
-''';
-  }
+evaluation: Provide a summary that is less then 20 words of the user’s current knowledge based on the quiz results, including areas of strength and topics needing improvement.
+title: Title of the course based on the subject.
+color: Generate a random 32-bit integer for the course theme color.
+progress: The overall progress of the course, starting at 0.0.
+isCompleted: A boolean value indicating whether the course has been completed, starting at false.
+description: A brief overview of what the user will learn in the course and how is it going to help.
+estimatedDuration: Calculate the full estimation the total time required to complete the course in minutes, based on the duration of each module and lesson.
+modules: Create at least 10 modules, each focusing on a different aspect of the subject and targets the user’s weaknesses and build upon their strengths.
 
-  static String getNewCourse(String subject, String userQuizzes) {
-    // The name of the course should be 5 words or less
-    return '''
+module.title: The title of the module.
+module.description: A brief description of the module.
+module.progress: The progress of the module, starting at 0.0.
+module.isCompleted: A boolean indicating whether the module is completed, starting at false.
+module.estimatedDuration: The estimated time, in minutes, to complete the module.
+module.lessons: Each module should contain at least 5 lessons, with in depth content provided in Markdown format. 
 
+lesson.title: The title of the lesson.
+lesson.description: A brief description of the lesson.
+lesson.progress: The progress of the lesson, starting at 0.0.
+lesson.isCompleted: A boolean indicating whether the lesson is completed, starting at false.
+lesson.content: In depth content about the lesson ensuring that the student fully understands the concepts of the lesson. Ensure that the content is in Markdown format.
+lesson.estimatedDuration: The estimated time, in minutes, to complete the lesson.
 ''';
   }
 }

@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:pathwise/main.dart';
 import 'package:pathwise/models/lesson_model.dart';
 import 'package:pathwise/models/module_model.dart';
 import 'package:pathwise/utils/colors.dart';
@@ -18,7 +17,7 @@ class ModuleCard extends StatefulWidget {
 
 class _ModuleCardState extends State<ModuleCard> {
   // The whole widget would have to rebuild anyways, so.. no provider
-  bool _isExpanded = true;
+  bool _isExpanded = false;
 
   @override
   Widget build(BuildContext context) {
@@ -28,34 +27,37 @@ class _ModuleCardState extends State<ModuleCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: AppColors.light,
-              borderRadius: BorderRadius.only(
-                topLeft: const Radius.circular(AppConstants.borderRadius),
-                topRight: const Radius.circular(AppConstants.borderRadius),
-                bottomLeft: _isExpanded ? Radius.zero : const Radius.circular(AppConstants.borderRadius),
-                bottomRight: _isExpanded ? Radius.zero : const Radius.circular(AppConstants.borderRadius),
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                _isExpanded = !_isExpanded;
+              });
+            },
+            child: Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: AppColors.light,
+                borderRadius: BorderRadius.only(
+                  topLeft: const Radius.circular(AppConstants.borderRadius),
+                  topRight: const Radius.circular(AppConstants.borderRadius),
+                  bottomLeft: _isExpanded ? Radius.zero : const Radius.circular(AppConstants.borderRadius),
+                  bottomRight: _isExpanded ? Radius.zero : const Radius.circular(AppConstants.borderRadius),
+                ),
               ),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(widget.module.title, style: AppTextStyles.quizTitle),
-                  // dropdown icon
-                  IconButton(
-                    highlightColor: Colors.transparent,
-                    onPressed: () {
-                      setState(() {
-                        _isExpanded = !_isExpanded; // Toggle the state
-                      });
-                    },
-                    icon: Icon(_isExpanded ? Icons.arrow_upward : Icons.arrow_downward, color: AppColors.dark, size: 20.0),
-                  )
-                ],
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                        child: Text(
+                      widget.module.title,
+                      style: AppTextStyles.quizTitle,
+                      softWrap: true,
+                    )),
+                    Icon(_isExpanded ? Icons.arrow_upward : Icons.arrow_downward, color: AppColors.dark, size: 20.0),
+                  ],
+                ),
               ),
             ),
           ),
@@ -94,7 +96,7 @@ class _ModuleCardState extends State<ModuleCard> {
                         GestureDetector(
                           onTap: () {
                             if (kDebugMode) print('Lesson ID: ${lesson.id}');
-                            Navigator.pushNamed(context, '/lesson', arguments: lesson.id);
+                            Navigator.pushNamed(context, '/lesson', arguments: lesson);
                           },
                           child: Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),

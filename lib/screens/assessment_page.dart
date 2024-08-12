@@ -7,18 +7,34 @@ import 'package:pathwise/utils/constants.dart';
 import 'package:pathwise/utils/text_styles.dart';
 import 'package:provider/provider.dart';
 
-class AssessmentPage extends StatelessWidget {
+class AssessmentPage extends StatefulWidget {
   const AssessmentPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final quizProvider = Provider.of<QuizProvider>(context, listen: false);
+  State<AssessmentPage> createState() => _AssessmentPageState();
+}
 
+class _AssessmentPageState extends State<AssessmentPage> {
+  late Future<void> _quizzesFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _quizzesFuture = _fetchQuizzes();
+  }
+
+  Future<void> _fetchQuizzes() async {
+    final quizProvider = Provider.of<QuizProvider>(context, listen: false);
+    await quizProvider.fetchQuizzes(quizProvider.subject);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
         appBar: const CustomAppBar(title: "Assessment", hasActionButton: false),
         body: FutureBuilder(
-          future: quizProvider.fetchQuizzes(quizProvider.subject),
+          future: _quizzesFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(

@@ -1,73 +1,111 @@
-// import 'dart:convert';
+import 'dart:convert';
+import 'package:flutter/foundation.dart';
+import 'package:pathwise/models/course_model.dart';
+import 'package:pathwise/models/lesson_model.dart';
+import 'package:pathwise/models/module_model.dart';
+import 'package:pathwise/services/isar_service.dart';
 
-// import 'package:flutter/foundation.dart';
-// import 'package:pathwise/models/course_model.dart';
-// import 'package:pathwise/models/lesson_model.dart';
-// import 'package:pathwise/models/module_model.dart';
-// import 'package:pathwise/providers/api_data_provider.dart';
-// import 'package:pathwise/services/isar_service.dart';
+class CourseProvider extends ChangeNotifier {
+  final IsarService _isarService = IsarService();
 
-// class CourseProvider extends ChangeNotifier {
-//   final IsarService _isarService = IsarService();
-//   final ApiDataProvider _apiDataProvider = ApiDataProvider();
-//   List<Course> _courses = [];
-//   List<Module> _modules = [];
-//   List<Lesson> _lessons = [];
+  List<Course> _courses = [];
 
-//   List<Course> get courses => _courses;
-//   List<Module> get modules => _modules;
-//   List<Lesson> get lessons => _lessons;
+  Future<void> fetchAllCourses() async {
+    _courses = await _isarService.getAllCourses();
+    notifyListeners();
+  }
 
-//   Future<void> fetchAllCourses() async {
-//     _courses = await _isarService.getAllCourses();
-//     notifyListeners();
-//   }
+  Future<void> addCourseFromAPI(String? data) async {
+    if (data != null) {
+      final cleanData = cleanJsonString(data);
+      final jsonData = customJsonDecode(cleanData);
 
-//   Future<void> fetchModulesFor(Course course) async {
-//     _modules = await _isarService.getModulesFor(course);
-//     notifyListeners();
-//   }
+      if (kDebugMode) print(cleanData);
 
-//   Future<void> fetchLessonsFor(Module module) async {
-//     _lessons = await _isarService.getLessonsFor(module);
-//     notifyListeners();
-//   }
+      final course = Course.fromJson(jsonData);
+      await _isarService.saveCourse(course);
 
-//   Future<void> saveCourse(Course course) async {
-//     await _isarService.saveCourse(course);
-//     _courses.add(course);
-//     notifyListeners();
-//   }
+      for (var moduleJson in jsonData['modules']) {
+        final module = Module.fromJson(moduleJson);
+        module.course.value = course;
 
-//   Future<void> saveModule(Module module) async {
-//     await _isarService.saveModule(module);
-//     _modules.add(module);
-//     notifyListeners();
-//   }
+        await _isarService.saveModule(module);
 
-//   Future<void> saveLesson(Lesson lesson) async {
-//     await _isarService.saveLesson(lesson);
-//     _lessons.add(lesson);
-//     notifyListeners();
-//   }
+        for (var lessonJson in moduleJson['lessons']) {
+          final lesson = Lesson.fromJson(lessonJson);
+          lesson.module.value = module;
 
-//   Future<void> clearDB() async {
-//     await _isarService.cleanDb();
-//     _courses.clear();
-//     _modules.clear();
-//     _lessons.clear();
-//     notifyListeners();
-//   }
+          await _isarService.saveLesson(lesson);
+        }
+      }
+    } else {
+      if (kDebugMode) print("No course data received from API");
+    }
+  }
 
-//   // ================== Getting Courses from the API ==================
+  Map<String, dynamic> customJsonDecode(String input) {
+    // final regex = RegExp(r'"content":\s*"(.*?)"', dotAll: true);
+    final regex = RegExp(r'"content":\s*"([\s\S]*?)"(?=\s*[,}])', multiLine: true);
+    final escapedInput = input.replaceAllMapped(regex, (match) {
+      String content = match.group(1)!;
+      content = content.replaceAll(r'\', r'\\'); // Escape backslashes
+      content = content.replaceAll('"', r'\"'); // Escape double quotes
+      content = content.replaceAll('\n', r'\n'); // Escape newlines
+      return '"content": "$content"';
+    });
 
-//   Future<void> saveCourseFromAPI() async {
-//     // await _apiDataProvider.fetchAssessmentQuizzes(subject);
-//     // String? courseJson = _apiDataProvider.data;
+    // Now use the standard JSON decoder
+    return json.decode(escapedInput) as Map<String, dynamic>;
+  }
 
-//     String? courseJson = '''
+  String cleanJsonString(String rawJson) {
+    // Remove leading whitespace
+    String trimmed = rawJson.trimLeft();
+
+    // Check if the string starts with ```json
+    if (trimmed.startsWith('```json')) {
+      trimmed = trimmed.substring(7);
+    } else if (trimmed.startsWith('```')) {
+      // If it just starts with ```, remove that
+      trimmed = trimmed.substring(3);
+    }
+
+    // Remove trailing whitespace
+    trimmed = trimmed.trimRight();
+
+    // Check if the string ends with ```
+    if (trimmed.endsWith('```')) {
+      trimmed = trimmed.substring(0, trimmed.length - 3);
+    }
+
+    // Trim any remaining whitespace
+    return trimmed.trim();
+  }
+
+  Future<void> clearDB() async {
+    await _isarService.cleanDb();
+    _courses.clear();
+    notifyListeners();
+  }
+
+  // ============== Getters & Setters ==============
+
+  List<Course> get courses => _courses;
+
+  Course getCourse(int courseId) {
+    return _courses.firstWhere((course) => course.id == courseId);
+  }
+
+  void toggleLessonCompletion(int lessonId, bool status) {
+    _isarService.setLessonCompletion(lessonId, status);
+    notifyListeners();
+  }
+}
+
+
 // {
-//   "title": "Flutter Development Masterclass",
+//   "evaluation": "You have a good grasp of the basics of Flutter development. However, you need to work on your understanding of Dart programming language, and some advanced Flutter concepts, and best practices. We will focus on these areas to improve your skills further.",
+//   "title": "Flutter Development",
 //   "color": 4280391411,
 //   "progress": 0.0,
 //   "isCompleted": false,
@@ -76,25 +114,28 @@
 //   "modules": [
 //     {
 //       "title": "Introduction to Flutter",
+//       "description": "Learn the basics of Flutter",
 //       "progress": 0.0,
 //       "isCompleted": false,
-//       "description": "Learn the basics of Flutter",
 //       "estimatedDuration": 600,
 //       "lessons": [
 //         {
 //           "title": "What is Flutter?",
+//           "description": "An overview of Flutter framework",
+//           "content": "The content of the course in markdown format goes here.",
 //           "progress": 0.0,
 //           "isCompleted": false,
-//           "description": "An overview of Flutter framework",
 //           "estimatedDuration": 300
 //         },
 //         {
 //           "title": "Setting up your development environment",
+//           "description": "Step-by-step guide to install Flutter SDK",
+//           "content": "The content of the course in markdown format goes here.",
 //           "progress": 0.0,
 //           "isCompleted": false,
-//           "description": "Step-by-step guide to install Flutter SDK",
 //           "estimatedDuration": 300
 //         }
+//         ...
 //       ]
 //     },
 //     {
@@ -106,184 +147,24 @@
 //       "lessons": [
 //         {
 //           "title": "Dart Syntax",
+//           "description": "Basic syntax and structure of Dart",
+//           "content": "The content of the course in markdown format goes here.",
 //           "progress": 0.0,
 //           "isCompleted": false,
-//           "description": "Basic syntax and structure of Dart",
 //           "estimatedDuration": 450
 //         },
 //         {
 //           "title": "Object-Oriented Programming in Dart",
+//           "description": "OOP concepts in Dart",
+//           "content": "The content of the course in markdown format goes here.",
 //           "progress": 0.0,
 //           "isCompleted": false,
-//           "description": "OOP concepts in Dart",
 //           "estimatedDuration": 450
 //         }
+//         ...
 //       ]
 //     }
+//     ...
 //   ]
 // }
 // ''';
-
-//     if (courseJson != null) {
-//       final decodedCourse = json.decode(courseJson);
-//       await _saveCourseFromJson(decodedCourse);
-//     } else {
-//       if (kDebugMode) print("No course data received from API");
-//     }
-//   }
-
-//   Future<void> _saveCourseFromJson(Map<String, dynamic> courseJson) async {
-//     final course = Course.fromJson(courseJson);
-//     await _isarService.saveCourse(course);
-
-//     for (var moduleJson in courseJson['modules']) {
-//       final module = Module.fromJson(moduleJson);
-//       module.course.value = course;
-//       await _isarService.saveModule(module);
-
-//       for (var lessonJson in moduleJson['lessons']) {
-//         final lesson = Lesson.fromJson(lessonJson);
-//         lesson.module.value = module;
-//         await _isarService.saveLesson(lesson);
-//       }
-//     }
-
-//     await fetchAllCourses();
-//   }
-
-//   // ================== Getters & Setters ==================
-
-//   Course getCourse(int courseId) {
-//     return _courses.firstWhere((course) => course.id == courseId);
-//   }
-
-//   Module getModule(int moduleId) {
-//     return _modules.firstWhere((module) => module.id == moduleId);
-//   }
-
-//   Lesson getLesson(int lessonId) {
-//     return _lessons.firstWhere((lesson) => lesson.id == lessonId);
-//   }
-
-//   void setProgress(int courseId, double progress) {
-//     final course = getCourse(courseId);
-//     course.progress = progress;
-//     notifyListeners();
-//   }
-// }
-
-import 'dart:convert';
-import 'package:flutter/foundation.dart';
-import 'package:pathwise/models/course_model.dart';
-import 'package:pathwise/providers/api_data_provider.dart';
-import 'package:pathwise/services/isar_service.dart';
-
-class CourseProvider extends ChangeNotifier {
-  final IsarService _isarService = IsarService();
-  final ApiDataProvider _apiDataProvider = ApiDataProvider();
-  List<Course> _courses = [];
-
-  List<Course> get courses => _courses;
-
-  Future<void> fetchAllCourses() async {
-    _courses = await _isarService.getAllCourses();
-    notifyListeners();
-  }
-
-  Future<void> saveCourse(Course course) async {
-    await _isarService.saveCourse(course);
-    _courses.add(course);
-    notifyListeners();
-  }
-
-  Future<void> clearDB() async {
-    await _isarService.cleanDb();
-    _courses.clear();
-    notifyListeners();
-  }
-
-  Future<void> saveCourseFromAPI() async {
-    // Replace this with actual API call when ready
-    String? courseJson = '''
-{
-  "title": "Flutter Development Masterclass",
-  "color": 4280391411,
-  "progress": 0.0,
-  "isCompleted": false,
-  "description": "A comprehensive course on Flutter development",
-  "estimatedDuration": 3600,
-  "modules": [
-    {
-      "title": "Introduction to Flutter",
-      "progress": 0.0,
-      "isCompleted": false,
-      "description": "Learn the basics of Flutter",
-      "estimatedDuration": 600,
-      "lessons": [
-        {
-          "title": "What is Flutter?",
-          "progress": 0.0,
-          "isCompleted": false,
-          "description": "An overview of Flutter framework",
-          "estimatedDuration": 300
-        },
-        {
-          "title": "Setting up your development environment",
-          "progress": 0.0,
-          "isCompleted": false,
-          "description": "Step-by-step guide to install Flutter SDK",
-          "estimatedDuration": 300
-        }
-      ]
-    },
-    {
-      "title": "Dart Programming Language",
-      "progress": 0.0,
-      "isCompleted": false,
-      "description": "Fundamentals of Dart programming",
-      "estimatedDuration": 900,
-      "lessons": [
-        {
-          "title": "Dart Syntax",
-          "progress": 0.0,
-          "isCompleted": false,
-          "description": "Basic syntax and structure of Dart",
-          "estimatedDuration": 450
-        },
-        {
-          "title": "Object-Oriented Programming in Dart",
-          "progress": 0.0,
-          "isCompleted": false,
-          "description": "OOP concepts in Dart",
-          "estimatedDuration": 450
-        }
-      ]
-    }
-  ]
-}
-    ''';
-
-    if (courseJson != null) {
-      final decodedCourse = json.decode(courseJson);
-      await _saveCourseFromJson(decodedCourse);
-    } else {
-      if (kDebugMode) print("No course data received from API");
-    }
-  }
-
-  Future<void> _saveCourseFromJson(Map<String, dynamic> courseJson) async {
-    final course = Course.fromJson(courseJson);
-    await _isarService.saveCourse(course);
-    await fetchAllCourses();
-  }
-
-  Course getCourse(int courseId) {
-    return _courses.firstWhere((course) => course.id == courseId);
-  }
-
-  void setProgress(int courseId, double progress) {
-    final course = getCourse(courseId);
-    course.progress = progress;
-    notifyListeners();
-  }
-}

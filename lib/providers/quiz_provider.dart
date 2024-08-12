@@ -5,26 +5,12 @@ import 'package:pathwise/models/quiz_model.dart';
 import 'package:pathwise/providers/api_data_provider.dart';
 
 class QuizProvider extends ChangeNotifier {
-  List<Quiz> _quizzes = [];
-  int _currentIndex = 0;
-  String _subject = '';
-  List<bool> _showErrors = [];
   final ApiDataProvider _apiDataProvider = ApiDataProvider();
 
-  List<Quiz> get quizzes => _quizzes;
-  int get currentIndex => _currentIndex;
-  String get subject => _subject;
+  String _subject = '';
+  List<Quiz> _quizzes = [];
 
-  void setQuizzes(List<Quiz> quizzes) {
-    _quizzes = quizzes;
-    _currentIndex = 0;
-    notifyListeners();
-  }
-
-  void setSubject(String subject) {
-    _subject = subject;
-    notifyListeners();
-  }
+  String _evaluation = '';
 
   Future<void> fetchQuizzes(String subject) async {
     await _apiDataProvider.fetchAssessmentQuizzes(subject);
@@ -35,22 +21,21 @@ class QuizProvider extends ChangeNotifier {
         List<dynamic> decodedQuizzes = jsonDecode(quizzesJson);
         _subject = subject;
         _quizzes = decodedQuizzes.map((quizJson) => Quiz.fromJson(quizJson)).toList();
-        _showErrors = List.generate(quizzes.length, (_) => false);
         notifyListeners();
       } catch (e) {
-        print("Error decoding quizzes: $e");
-        // Handle error (e.g., show an error message to the user)
+        if (kDebugMode) print("Error decoding quizzes: $e");
       }
     } else {
-      print("No quiz data received from API");
-      // Handle error (e.g., show an error message to the user)
+      if (kDebugMode) print("No quiz data received from API");
     }
   }
 
-  void updateAnswers(int quizIndex, List<int> selectedAnswers) {
-    if (quizIndex < _quizzes.length) {
-      _quizzes[quizIndex].userAnswers = selectedAnswers;
-      notifyListeners();
+  Future<void> fetchEvaluationFromAPI(String? data) async {
+    if (data != null) {
+      final jsonData = json.decode(data);
+      _evaluation = jsonData['evaluation'];
+    } else {
+      if (kDebugMode) print("No course data received from API");
     }
   }
 
@@ -64,7 +49,30 @@ class QuizProvider extends ChangeNotifier {
     return jsonEncode(quizzesJson);
   }
 
-  double evaluateQuizAnswers(List<Quiz> quizzes) {
+  // ============== Getters & Setters ==============
+
+  List<Quiz> get quizzes => _quizzes;
+  String get subject => _subject;
+  String get evaluation => _evaluation;
+
+  void setQuizzes(List<Quiz> quizzes) {
+    _quizzes = quizzes;
+    notifyListeners();
+  }
+
+  void setSubject(String subject) {
+    _subject = subject;
+    notifyListeners();
+  }
+
+  void updateAnswers(int quizIndex, List<int> selectedAnswers) {
+    if (quizIndex < _quizzes.length) {
+      _quizzes[quizIndex].userAnswers = selectedAnswers;
+      notifyListeners();
+    }
+  }
+
+  double getQuizScore(List<Quiz> quizzes) {
     double totalScore = 0;
 
     for (var quiz in quizzes) {
@@ -75,18 +83,14 @@ class QuizProvider extends ChangeNotifier {
       userAnswers.sort();
 
       if (userAnswers.every((answer) => correctAnswers.contains(answer))) {
-        // All user answers are correct
         if (userAnswers.length == correctAnswers.length) {
-          // User guessed all correct answers
           totalScore += 1;
         } else {
-          // User guessed some correct answers, but not all
           totalScore += userAnswers.length / correctAnswers.length;
         }
       }
-      // If user guessed any wrong answers or a mix of correct and wrong, they get 0 points (default case)
     }
 
-    return totalScore;
+    return (totalScore / quizzes.length) * 100;
   }
 }

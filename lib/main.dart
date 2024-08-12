@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:pathwise/models/lesson_model.dart';
 import 'package:pathwise/providers/course_provider.dart';
 import 'package:pathwise/providers/api_data_provider.dart';
-import 'package:pathwise/providers/lesson_provider.dart';
-import 'package:pathwise/providers/module_provider.dart';
 import 'package:pathwise/providers/quiz_provider.dart';
 import 'package:pathwise/screens/assessment_page.dart';
 import 'package:pathwise/screens/course_page.dart';
 import 'package:pathwise/screens/home_page.dart';
+import 'package:pathwise/screens/lesson_page.dart';
 import 'package:pathwise/screens/results_page.dart';
 import 'package:pathwise/screens/pre_assessment_page.dart';
 import 'package:pathwise/utils/colors.dart';
@@ -33,8 +33,6 @@ void main() async {
         ChangeNotifierProvider(create: (_) => ApiDataProvider()),
         ChangeNotifierProvider(create: (_) => QuizProvider()),
         ChangeNotifierProvider(create: (_) => CourseProvider()),
-        ChangeNotifierProvider(create: (_) => ModuleProvider()),
-        ChangeNotifierProvider(create: (_) => LessonProvider()),
       ],
       child: const App(),
     ),
@@ -86,6 +84,12 @@ class App extends StatelessWidget {
             final id = settings.arguments as int;
             return PageTransition(
               builder: (context) => CoursePage(courseId: id),
+              settings: settings,
+            );
+          case '/lesson':
+            final lesson = settings.arguments as Lesson;
+            return PageTransition(
+              builder: (context) => LessonPage(lesson: lesson),
               settings: settings,
             );
           default:

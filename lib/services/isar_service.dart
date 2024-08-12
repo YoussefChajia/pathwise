@@ -58,4 +58,41 @@ class IsarService {
     final isar = await db;
     await isar.writeTxn(() => isar.clear());
   }
+
+  Future<void> setLessonCompletion(int lessonId, bool completed) async {
+    final isar = await db;
+
+    // Fetch all necessary data before starting the transaction
+    final lesson = await isar.lessons.get(lessonId);
+    if (lesson == null) return;
+
+    final module = await isar.modules.get(lesson.module.value?.id ?? -1);
+    if (module == null) return;
+
+    final course = await isar.courses.get(module.course.value?.id ?? -1);
+    if (course == null) return;
+
+    final moduleLessons = await isar.lessons.filter().module((q) => q.idEqualTo(module.id)).findAll();
+
+    final courseModules = await isar.modules.filter().course((q) => q.idEqualTo(course.id)).findAll();
+
+    // Now perform all updates within a single transaction
+    await isar.writeTxn(() async {
+      // Update lesson
+      lesson.isCompleted = completed;
+      lesson.progress = completed ? 1.0 : 0.0;
+      lesson.updatedAt = DateTime.now();
+      await isar.lessons.put(lesson);
+
+      // Update module
+      module.isCompleted = moduleLessons.every((l) => l.id == lessonId ? completed : l.isCompleted);
+      module.progress = (moduleLessons.map((l) => l.id == lessonId ? (completed ? 1.0 : 0.0) : l.progress).reduce((a, b) => a + b)) / moduleLessons.length;
+      await isar.modules.put(module);
+
+      // Update course
+      course.isCompleted = courseModules.every((m) => m.id == module.id ? module.isCompleted : m.isCompleted);
+      course.progress = (courseModules.map((m) => m.id == module.id ? module.progress : m.progress).reduce((a, b) => a + b)) / courseModules.length;
+      await isar.courses.put(course);
+    });
+  }
 }

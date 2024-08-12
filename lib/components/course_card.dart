@@ -1,14 +1,17 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:pathwise/models/course_model.dart';
+import 'package:pathwise/models/lesson_model.dart';
 import 'package:pathwise/utils/colors.dart';
 import 'package:pathwise/utils/constants.dart';
 import 'package:pathwise/utils/text_styles.dart';
 
 class CourseCard extends StatelessWidget {
   final Course course;
+  final Lesson currentLesson;
+  final Lesson nextLesson;
 
-  const CourseCard({super.key, required this.course});
+  const CourseCard({super.key, required this.course, required this.currentLesson, required this.nextLesson});
 
   @override
   Widget build(BuildContext context) {
@@ -20,8 +23,8 @@ class CourseCard extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 16.0),
         child: Container(
-          height: 170,
           decoration: BoxDecoration(
+            // Use a hex to decimal converter for the color
             color: Color(course.color),
             borderRadius: BorderRadius.circular(AppConstants.borderRadius * 2),
           ),
@@ -35,6 +38,7 @@ class CourseCard extends StatelessWidget {
                   course.title,
                   style: AppTextStyles.header3,
                 ),
+                const SizedBox(height: 10),
                 Row(
                   children: [
                     Column(
@@ -45,22 +49,26 @@ class CourseCard extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(width: 10),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Current Lesson: Control Flow',
-                          style: AppTextStyles.body,
-                        ),
-                        const SizedBox(height: 5),
-                        Text(
-                          'Next Lesson: Loops',
-                          style: AppTextStyles.body,
-                        ),
-                      ],
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Current - ${currentLesson.title}",
+                            style: AppTextStyles.body,
+                          ),
+                          const SizedBox(height: 5),
+                          Text(
+                            "${nextLesson.title}",
+                            style: AppTextStyles.body,
+                            softWrap: true,
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
+                const SizedBox(height: 16),
                 Stack(
                   children: [
                     Stack(
@@ -74,19 +82,19 @@ class CourseCard extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          '${course.progress.toStringAsFixed(0)} %',
+                          '${(course.progress * 100).toStringAsFixed(0)} %',
                           style: TextStyle(
                             fontFamily: 'Outfit',
                             fontSize: 14.0,
                             fontWeight: FontWeight.w500,
-                            color: course.progress < 45 ? AppColors.light : Colors.transparent,
+                            color: course.progress < 0.45 ? AppColors.light : Colors.transparent,
                           ),
                         )
                       ],
                     ),
                     LayoutBuilder(
                       builder: (context, constraints) {
-                        final progressWidth = constraints.maxWidth * (course.progress / 100);
+                        final progressWidth = constraints.maxWidth * course.progress;
                         return Stack(
                           alignment: Alignment.center,
                           children: [
@@ -100,12 +108,12 @@ class CourseCard extends StatelessWidget {
                             ),
                             // Progress text
                             Text(
-                              '${course.progress.toStringAsFixed(0)} %',
+                              '${(course.progress * 100).toStringAsFixed(0)} %',
                               style: TextStyle(
                                 fontFamily: 'Outfit',
                                 fontSize: 14.0,
                                 fontWeight: FontWeight.w500,
-                                color: course.progress >= 45 ? Color(course.color) : Colors.transparent,
+                                color: course.progress >= 0.45 ? Color(course.color) : Colors.transparent,
                               ),
                             )
                           ],
