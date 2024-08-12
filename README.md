@@ -1,16 +1,5 @@
-# pathwise
+Pathwise is the latest AI-driven application that empowers users to succeed in any area within computer science by using personalized, adaptive learning pathways. First, after choosing a subject, Pathwise conducts thorough assessment exercises to estimate the present level of knowledge of the student. Taking into account the results, the application designs a personalized learning journey, modulating its complexity dynamically to keep users in a state of flow. The outcome will be that users are always challenged but never overwhelmed for maximum efficacy in learning.
 
-A new Flutter project.
+The app will have gamification tools as rewards, achievements, and daily challenges are embedded to make this learning process fun. Interactive lessons with real-life applications and instant feedback from the AI help get a deeper understanding of the concept. If needed, users can ask the AI for explanation or further support; thus, Pathwise acts really as a personalized tutor in everybody's pocket.
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Through the integration of Gemini's API, Pathwise can provide state-of-the-art Natural Language Understanding and Generation for the ability to give instant, accurate responses to user queries and make an application more interactive and responsive. Put this adaptive learning, gamification, and AI-aided features together, you have in Pathwise the ultimate tool for acing Computer Science.
